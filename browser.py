@@ -1,5 +1,7 @@
 import time
 import requests
+import functools
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -20,6 +22,7 @@ def check_server_ready(url, retries=10, delay=1):
             time.sleep(delay)
     return False
 
+@functools.cache
 def configure_chrome_options(url):
     chrome_options = Options()
     # chrome_options.add_argument("--auto-open-devtools-for-tabs")  # Remove this line to prevent DevTools from opening
@@ -86,12 +89,19 @@ def remove_loading_mask(driver):
         }
     """)
 
+@functools.cache
+def serviceChromeDriverManager():
+    return Service(ChromeDriverManager().install())
+
 def main(URL, ls):
+    """
     if not check_server_ready(URL):
         raise RuntimeError("Il y a un problème avec l'url donner")
+    """
 
     chrome_options = configure_chrome_options(URL)
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+    service = serviceChromeDriverManager()
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
         driver.get(URL)
@@ -102,7 +112,7 @@ def main(URL, ls):
 
         position = driver.get_window_position()
         size = driver.get_window_size()
-        position["x"] = int(position["x"] + size["width"] * 0.80)
+        position["x"] = int(position["x"] + size["width"] * 0.50)
         position["y"] = int(position["y"] + size["height"] * 0.80)
 
         response = winReponse(ls, position)

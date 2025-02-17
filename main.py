@@ -5,9 +5,10 @@ import browser
 
 import random
 import os
+from dotenv import load_dotenv
 
 # récupère url dans le .env
-URL = os.getenv("URL")
+URL = "https://smp.qwerta.fr"
 
 # demande un entier positif a l'utilisateur
 def askInt(message, default):
@@ -47,7 +48,7 @@ def main():
 
     zoom = askInt("Zoom : ", 6)
 
-    numberResponse = 4
+    numResponses = 4
 
     score = 0
 
@@ -58,9 +59,9 @@ def main():
         other = files.otherHomes(element, json)
 
         url = f"{URL}/?worldname=world&mapname=surface&zoom={zoom}&x={element["pos"][0]}&y=64&z={element["pos"][1]}"
-        reponseId = random.randint(0, numberResponse-1)
+        reponseId = random.randint(0, numResponses-1)
 
-        ls = [None] * numberResponse
+        ls = [None] * numResponses
         ls[reponseId] = element
         for i, e in enumerate(ls):
             if e:
@@ -81,7 +82,6 @@ def main():
             gui.retour(False, score, responseLs[reponseId])
 
     print("fin")
-    
 
 if __name__ == "__main__":
     main()

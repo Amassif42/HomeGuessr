@@ -1,18 +1,48 @@
 import tkinter as tk
 from tkinter import messagebox
 
-def winReponse(ls, position=None, max=6):
-
-    root = tk.Tk()
-    root.title("Button Clicker")
-    root.attributes('-topmost', True)  # Assure que la fenêtre soit au premier plan
-
-
-    # Positionner la fenêtre
+def set_window_position(root, position):
+    root.update_idletasks()  # Ensure the window dimensions are calculated
     if position:
         x = position["x"]
         y = position["y"]
-        root.geometry(f"+{x}+{y}")
+
+        wwidth = root.winfo_width()
+        wheight = root.winfo_height()
+
+        # Get screen width and height
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        # Calculate new position
+        new_x = x - (wwidth // 2)
+        new_y = y - (wheight // 2)
+
+        # Ensure the window is within screen bounds
+        if new_x < 0:
+            new_x = 0
+        elif new_x + wwidth > screen_width:
+            new_x = screen_width - wwidth
+
+        if new_y < 0:
+            new_y = 0
+        elif new_y + wheight > screen_height:
+            new_y = screen_height - wheight
+
+        root.geometry(f"+{new_x}+{new_y}")
+
+def on_mouse_move(root):
+    """Retourne la position actuelle de la souris sous forme de dictionnaire."""
+    return {"x": root.winfo_pointerx(), "y": root.winfo_pointery()}
+
+def winReponse(ls, position=None, max=6):
+
+    root = tk.Tk()
+    root.title("HoneGuessr")
+    root.attributes('-topmost', True)  # Assure que la fenêtre soit au premier plan
+
+    # Positionner la fenêtre
+    set_window_position(root, position)
 
     clicked_button = tk.IntVar(value=-1)
 
@@ -47,6 +77,7 @@ def winReponse(ls, position=None, max=6):
     return clicked_button.get()
 
 def secletPlayer(playerLs, position=None):
+    print(position)
     selected_players = []
 
     def on_select(*args):
@@ -68,13 +99,12 @@ def secletPlayer(playerLs, position=None):
 
     while playerLs:
         root = tk.Tk()
-        root.title("Select Player")
+        root.title("Player selection")
         root.attributes('-topmost', True)  # Ensure the window is on top
 
         if position:
-            x = position["x"]
-            y = position["y"]
-            root.geometry(f"+{x}+{y}")
+            print("test")
+            set_window_position(root, position)
 
         defaultText = "Choisissez un joueur"
         options = [defaultText] + playerLs
@@ -101,15 +131,15 @@ def secletPlayer(playerLs, position=None):
 
     return selected_players
 
-def retour(io, score, reponse, position=None):
+def retour(io, score, reponse):
     root = tk.Tk()
-    root.title("Message")
+    root.title("Info")
     root.attributes('-topmost', True)  # Ensure the window is on top
 
+    position = on_mouse_move(root)
+
     if position:
-        x = position["x"]
-        y = position["y"]
-        root.geometry(f"+{x}+{y}")
+        set_window_position(root, position)
 
     message = "Félicitation 🎉🎉" if io else "Echéque ):"
     message += f"\n La réponse était {reponse}"
@@ -127,4 +157,5 @@ def retour(io, score, reponse, position=None):
 
 if __name__ == "__main__":
     playerLs = ["player1", "player2", "player3", "player4", "player5", "player6", "player7", "player8", "player9", "player10"]
-    print(secletPlayer(playerLs))
+    p = {"x": 500, "y": 500}
+    print(secletPlayer(playerLs, p))
